@@ -1,6 +1,7 @@
 /// switch-title.js
 /// alias swtie.js
 (function() {
+    console.error('hello world');
     const primaryInfo = document.querySelector('script[type="application/json"]');
     console.error(primaryInfo);
     if (primaryInfo) {
