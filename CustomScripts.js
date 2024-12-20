@@ -2,12 +2,14 @@
 /// alias swtie.js
 (function() {
     const primaryInfo = document.querySelector('script[type="application/json"]');
+    console.error(primaryInfo);
     if (primaryInfo) {
         try {
             const json = JSON.parse(primaryInfo.textContent);
             if (json.videoPrimaryInfoRenderer && json.videoPrimaryInfoRenderer.title) {
                 const currentTitle = json.videoPrimaryInfoRenderer.title.runs[0].text;
                 const newTitleElement = document.querySelector('.attribute-name[title] + .attribute-value');
+                console.error(currentTitle, newTitleElement);
                 
                 if (newTitleElement) {
                     const newTitle = newTitleElement.textContent;
