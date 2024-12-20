@@ -1,4 +1,4 @@
-twitch-videoad.js text/javascript
+switch-title.js text/javascript
     (function() {
         const meta = document.querySelector('meta[name="title"]');
         if (meta?.content) {
