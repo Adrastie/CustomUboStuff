@@ -1,34 +1,43 @@
 /// switch-title.js
 /// alias swtie.js
 (function() {
-    console.warn('caca loaded');
+    console.log('Switch-Title script loaded');
+
     const metaTitleElement = document.querySelector('meta[name="title"]');
     if (!metaTitleElement || !metaTitleElement.content) {
-        console.warn('caca Meta title not found or empty');
+        console.warn('Switch-Title Meta title not found or empty');
         return;
     }
     const metaTitle = metaTitleElement.content;
 
     const jsonScript = document.querySelector('script[type="application/json"]');
-    if (jsonScript) {
-        try {
-            const jsonData = JSON.parse(jsonScript.textContent);
+    if (!jsonScript) {
+        console.warn('Switch-Title JSON script element not found');
+        return;
+    }
 
-            const videoPrimaryInfo = jsonData?.twoColumnWatchNextResults?.results?.results?.contents?.find(
-                item => item?.videoPrimaryInfoRenderer
-            );
-            if (videoPrimaryInfo) {
-                const currentTitle = videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text;
-                videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text = metaTitle;
-                jsonScript.textContent = JSON.stringify(jsonData);
-                console.log(`caca Replaced title "${currentTitle}" with "${metaTitle}"`);
-            } else {
-                console.warn('caca Video primary info not found in JSON structure');
-            }
-        } catch (error) {
-            console.error('caca Failed to parse or modify JSON:', error);
+    if (!jsonScript.textContent.trim()) {
+        console.warn('Switch-Title JSON script content is empty');
+        return;
+    }
+
+    try {
+        const jsonData = JSON.parse(jsonScript.textContent);
+        const videoPrimaryInfo = jsonData?.twoColumnWatchNextResults?.results?.results?.contents?.find(
+            item => item?.videoPrimaryInfoRenderer
+        );
+
+        if (!videoPrimaryInfo || !videoPrimaryInfo.videoPrimaryInfoRenderer?.title?.runs?.length) {
+            console.warn('Switch-Title Video primary info or title runs not found in JSON structure');
+            return;
         }
-    } else {
-        console.warn('caca JSON script element not found');
+
+        const currentTitle = videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text;
+        videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text = metaTitle;
+        jsonScript.textContent = JSON.stringify(jsonData);
+
+        console.log(`Switch-Title Replaced title "${currentTitle}" with "${metaTitle}"`);
+    } catch (error) {
+        console.error('Switch-Title Failed to parse or modify JSON:', error);
     }
 })();
