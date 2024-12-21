@@ -4,7 +4,7 @@
     console.warn('caca loaded');
     const metaTitleElement = document.querySelector('meta[name="title"]');
     if (!metaTitleElement || !metaTitleElement.content) {
-        console.warn('Meta title not found or empty');
+        console.warn('caca Meta title not found or empty');
         return;
     }
     const metaTitle = metaTitleElement.content;
@@ -21,14 +21,14 @@
                 const currentTitle = videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text;
                 videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text = metaTitle;
                 jsonScript.textContent = JSON.stringify(jsonData);
-                console.log(`Replaced title "${currentTitle}" with "${metaTitle}"`);
+                console.log(`caca Replaced title "${currentTitle}" with "${metaTitle}"`);
             } else {
-                console.warn('Video primary info not found in JSON structure');
+                console.warn('caca Video primary info not found in JSON structure');
             }
         } catch (error) {
-            console.error('Failed to parse or modify JSON:', error);
+            console.error('caca Failed to parse or modify JSON:', error);
         }
     } else {
-        console.warn('JSON script element not found');
+        console.warn('caca JSON script element not found');
     }
 })();
