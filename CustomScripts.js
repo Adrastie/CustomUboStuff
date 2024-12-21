@@ -1,43 +1,65 @@
 /// switch-title.js
 /// alias swtie.js
-(function() {
-    console.log('Switch-Title script loaded');
-
-    const metaTitleElement = document.querySelector('meta[name="title"]');
-    if (!metaTitleElement || !metaTitleElement.content) {
-        console.warn('Switch-Title Meta title not found or empty');
-        return;
-    }
-    const metaTitle = metaTitleElement.content;
-
-    const jsonScript = document.querySelector('script[type="application/json"]');
-    if (!jsonScript) {
-        console.warn('Switch-Title JSON script element not found');
-        return;
-    }
-
-    if (!jsonScript.textContent.trim()) {
-        console.warn('Switch-Title JSON script content is empty');
-        return;
-    }
-
-    try {
-        const jsonData = JSON.parse(jsonScript.textContent);
-        const videoPrimaryInfo = jsonData?.twoColumnWatchNextResults?.results?.results?.contents?.find(
-            item => item?.videoPrimaryInfoRenderer
-        );
-
-        if (!videoPrimaryInfo || !videoPrimaryInfo.videoPrimaryInfoRenderer?.title?.runs?.length) {
-            console.warn('Switch-Title Video primary info or title runs not found in JSON structure');
-            return;
+(function () {
+    // Fonction pour valider un JSON
+    function isValidJson(string) {
+        try {
+            JSON.parse(string);
+            return true;
+        } catch {
+            return false;
         }
-
-        const currentTitle = videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text;
-        videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text = metaTitle;
-        jsonScript.textContent = JSON.stringify(jsonData);
-
-        console.log(`Switch-Title Replaced title "${currentTitle}" with "${metaTitle}"`);
-    } catch (error) {
-        console.error('Switch-Title Failed to parse or modify JSON:', error);
     }
+
+    // Fonction pour extraire et modifier le JSON, et mettre à jour le DOM
+    function modifyVideoTitle() {
+        try {
+            console.log("### Début de la tentative de modification ###");
+
+            // Étape 1 : Trouver l'élément du titre dans le DOM
+            const titleElement = document.querySelector('h1.title');
+
+            if (!titleElement) {
+                console.warn('Impossible de trouver le titre de la vidéo dans le DOM.');
+                return false;
+            }
+
+            // Étape 2 : Définir le titre directement dans le DOM
+            const newTitle = 'Stop using WD-40';
+            console.log('Titre avant modification :', titleElement.textContent);
+
+            titleElement.textContent = newTitle; // Mise à jour visible dans la page
+            console.log('Titre après modification :', titleElement.textContent);
+
+            // Étape 3 : Optionnel - Mise à jour dans les métadonnées `<meta>`
+            const metaTitle = document.querySelector('meta[name="title"]');
+            if (metaTitle) {
+                metaTitle.setAttribute('content', newTitle);
+                console.log('Meta title mis à jour :', metaTitle.getAttribute('content'));
+            }
+
+            return true;
+        } catch (err) {
+            console.error('Erreur lors de la tentative de modification :', err);
+            return false;
+        }
+    }
+
+    // Retenter après un délai ou observer les changements dynamiques
+    setTimeout(() => {
+        const success = modifyVideoTitle();
+
+        if (!success) {
+            console.log("### Échec initial, activation du système d'observation pour réessayer. ###");
+            const observer = new MutationObserver(() => {
+                const successRetry = modifyVideoTitle();
+                if (successRetry) {
+                    console.log("### Modification réussie grâce à MutationObserver. ###");
+                    observer.disconnect();
+                }
+            });
+
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+    }, 2000);
 })();
