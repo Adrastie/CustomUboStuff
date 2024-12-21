@@ -1,32 +1,34 @@
 /// switch-title.js
 /// alias swtie.js
 (function() {
-    console.error('caca hello world');
-    const primaryInfo = document.querySelector('script[type="application/json"]');
-    console.error('caca', primaryInfo);
-    if (primaryInfo) {
-        try {
-            const json = JSON.parse(primaryInfo.textContent);
-            if (json.videoPrimaryInfoRenderer && json.videoPrimaryInfoRenderer.title) {
-                const currentTitle = json.videoPrimaryInfoRenderer.title.runs[0].text;
-                const newTitleElement = document.querySelector('.attribute-name[title] + .attribute-value');
-                console.error('caca', currentTitle, newTitleElement);
-                
-                if (newTitleElement) {
-                    const newTitle = newTitleElement.textContent;
-                    json.videoPrimaryInfoRenderer.title.runs[0].text = newTitle;
-                    primaryInfo.textContent = JSON.stringify(json);
-                    console.log('Replaced title "${currentTitle}" with "${newTitle}"');
-                }
-            }
-        } catch (e) {
-            console.error('caca Error modifying title:', e);
-        }
+    console.warn('caca loaded');
+    const metaTitleElement = document.querySelector('meta[name="title"]');
+    if (!metaTitleElement || !metaTitleElement.content) {
+        console.warn('Meta title not found or empty');
+        return;
     }
+    const metaTitle = metaTitleElement.content;
 
-    const titleElement = document.querySelector('title');
-    const metaTitleElement = document.querySelector('.attribute-name[title] + .attribute-value');
-    if (titleElement && metaTitleElement) {
-        titleElement.textContent = metaTitleElement.textContent;
+    const jsonScript = document.querySelector('script[type="application/json"]');
+    if (jsonScript) {
+        try {
+            const jsonData = JSON.parse(jsonScript.textContent);
+
+            const videoPrimaryInfo = jsonData?.twoColumnWatchNextResults?.results?.results?.contents?.find(
+                item => item?.videoPrimaryInfoRenderer
+            );
+            if (videoPrimaryInfo) {
+                const currentTitle = videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text;
+                videoPrimaryInfo.videoPrimaryInfoRenderer.title.runs[0].text = metaTitle;
+                jsonScript.textContent = JSON.stringify(jsonData);
+                console.log(`Replaced title "${currentTitle}" with "${metaTitle}"`);
+            } else {
+                console.warn('Video primary info not found in JSON structure');
+            }
+        } catch (error) {
+            console.error('Failed to parse or modify JSON:', error);
+        }
+    } else {
+        console.warn('JSON script element not found');
     }
 })();
